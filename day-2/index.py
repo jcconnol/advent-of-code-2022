@@ -5,10 +5,55 @@ import array
 
 def run_first_problem():
     print("first problem")
-    file_lines = file_to_array("day-1/day-1.txt")
-    
+    file_lines = file_to_array("day-2/day-2.txt")
+    total_points = 0
+    # 1 for Rock, 2 for Paper, and 3 for Scissors
+    # x for Rock, Y for Paper, and Z for Scissors
     for line in file_lines:
-        print(line)            
+        line = line.split(' ')
+        
+        if(line[0] == "A"):
+            if(line[1] == "X"):
+                total_points += 0
+                total_points += 3
+                
+            if(line[1] == "Y"):
+                total_points += 3
+                total_points += 1
+            
+            if(line[1] == "Z"):
+                total_points += 6
+                total_points += 2
+        
+        if(line[0] == "B"):
+            if(line[1] == "X"):
+                total_points += 0
+                total_points += 1
+                
+            if(line[1] == "Y"):
+                total_points += 3
+                total_points += 2
+            
+            if(line[1] == "Z"):
+                total_points += 6
+                total_points += 3
+        
+        if(line[0] == "C"):
+            if(line[1] == "X"):
+                total_points += 0
+                total_points += 2
+                
+            if(line[1] == "Y"):
+                total_points += 3
+                total_points += 3
+            
+            if(line[1] == "Z"):
+                total_points += 6
+                total_points += 1
+            
+        
+        print(total_points)
+            
     
     
     
