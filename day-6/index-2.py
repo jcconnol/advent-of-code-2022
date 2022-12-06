@@ -7,6 +7,10 @@ def run_first_problem():
     file_lines = file_to_array("day-6/day-6.txt")
     total_count = 0
     
+    
+    
+    
+    
     print(total_count)
     
     
