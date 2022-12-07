@@ -31,7 +31,6 @@ def run_first_problem():
     for f in folders.values():
         if folders['/'] - f <= 40000000:
             total_array.append(f)
-            min([f for f in folders.values() if folders['/'] - f <= 40_000_000])
             
     print(min(total_array))
     
