@@ -1,44 +1,82 @@
-import os
-import sys
-import numpy as np
-import array
+import functools
+import copy
 
-def run_first_problem():
-    file_lines = file_to_array("day-7/day-7.txt")
-    total_count = 0
-    
-    # output index of end of first 4 characters that are all different
-    for line in file_lines: 
-        print("")
-    
-    
-    
-    
-def isUniqueChars(st):
- 
-    # String length cannot be more than
-    # 256.
-    if len(st) > 256:
-        return False
- 
-    # Initialize occurrences of all characters
-    char_set = [False] * 128
- 
-    # For every character, check if it exists
-    # in char_set
-    for i in range(0, len(st)):
- 
-        # Find ASCII value and check if it
-        # exists in set.
-        val = ord(st[i])
-        if char_set[val]:
-            return False
- 
-        char_set[val] = True
- 
-    return True
-    
-    
+with open("day-7/day-7.txt") as f:
+    lines = [str.strip(s) for s in f.readlines()]
+    dirs = []
+    contents = {}
+
+    listing = False
+
+    for line in lines:
+        if line.startswith("$"):
+            listing = False
+            line = line[2:]
+            if line.startswith("cd"):
+                dir = line.split(" ")[-1]
+                if dir == "/":
+                    dirs = [""]
+                elif dir == "..":
+                    dirs.pop()
+                else:
+                    dirs.append(dir)
+            elif line.startswith("ls"):
+                listing = True
+        elif listing:
+            key = "/".join(dirs)
+            if key not in contents:
+                contents[key] = {"size": 0, "files": []}
+            if line.startswith("dir"):
+                contents[key]["files"].append(line.split(" ")[1])
+            else:
+                contents[key]["size"] += int((line.split(" "))[0])
+
+    @functools.cache
+    def file_size(key):
+        sub_size = sum([file_size(key + "/" + d) for d in contents[key]["files"]])
+        return contents[key]["size"] + sub_size
+
+    count = 0
+
+    for key in contents:
+        size = file_size(key)
+        if size <= 100000:
+            count += size
+
+    print("Part 1 " + str(count))
+
+    total = 70000000
+    needed = 30000000
+    best = 70000000
+
+    for key in contents:
+        old_size = file_size(key)
+        new_contents = copy.deepcopy(contents)
+
+        def remove(key):
+            new_contents[key]["size"] = 0
+            for f in new_contents[key]["files"]:
+                remove(key + "/" + f)
+                new_contents[key]["files"] = []
+
+        remove(key)
+        print(key)
+        print(new_contents)
+
+        @functools.cache
+        def rfs(key):
+            sub_size = sum([rfs(key + "/" + d) for d in new_contents[key]["files"]])
+            return new_contents[key]["size"] + sub_size
+
+        c = rfs("")
+        print(c)
+        if total - c >= needed:
+            if old_size < best:
+                best = old_size
+    print("Part 2 " + str(best))
+
+
+
 def file_to_array(file_name):
     line_array = []
     with open(file_name) as my_file:
@@ -47,5 +85,49 @@ def file_to_array(file_name):
             
     return line_array
 
-if __name__ == '__main__':
-    run_first_problem()
+
+file_lines = file_to_array("day-7/day-7.txt")
+total_count = 0
+    
+for line in file_lines:
+    dirs = []
+    contents = {}
+    listing = False
+    
+    line = line.split(" ")
+    if line[0] == "$":
+        if line[1] == "cd":
+            listing = False
+            if dir == "/":
+                dirs = [""]
+            elif dir == "..":
+                dirs.pop()
+            else:
+                dirs.append(dir)
+        else:
+            listing = True
+        
+    if listing:
+        key = "/".join(dirs)
+        if key not in contents:
+            contents[key] = {"size": 0, "files": []}
+        if line[1] == "dir":
+            contents[key]["files"].append(line[1])
+        else:
+            contents[key]["size"] += int(line[0])
+        
+        
+        
+@functools.cache
+def file_size(key):
+    sub_size = sum([file_size(key + "/" + d) for d in contents[key]["files"]])
+    return contents[key]["size"] + sub_size
+
+count = 0
+
+for key in contents:
+    size = file_size(key)
+    if size <= 100000:
+        count += size
+
+print("Part 1 " + str(count))
