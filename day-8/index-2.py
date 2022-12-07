@@ -8,32 +8,19 @@ path = []
 folders = defaultdict(int)
 
 def run_first_problem():
-    with open('day-7/day-7.txt', 'r') as f:
-        for line in f:
-            if line[:7] == '$ cd ..':
-                path.pop()
-            elif line[:4] == '$ cd':
-                path.append(line.strip()[5:])
-            elif line[0].isdigit():
-                size = line.split()
-                for i in range(len(path)):
-                    folders['/'.join(path[:i + 1])] += int(size[0])
+    file_lines = file_to_array("day-8/day-8.txt")
+    total_count = 0
     
-    total = 0
-    for f in folders.values():
-        if f <= 100000:
-            total += f
-            
-    print(total)
+    for line in file_lines:
+        print(line)
     
-    total2 = 0
-    total_array = []
-    for f in folders.values():
-        if folders['/'] - f <= 40000000:
-            total_array.append(f)
-            min([f for f in folders.values() if folders['/'] - f <= 40_000_000])
-            
-    print(min(total_array))
+    
+    
+    print(total_count)
+    
+    
+    
+    
     
     
 def isUniqueChars(st):
