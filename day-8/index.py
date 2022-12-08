@@ -10,13 +10,75 @@ folders = defaultdict(int)
 def run_first_problem():
     file_lines = file_to_array("day-8/day-8.txt")
     total_count = 0
+    tree_array = []
+    tree_score_array = []
     
     for line in file_lines:
-        print(line)
+        tree_array.append(line)
+            
+    row_index = 0
+    column_index = 0
     
+    print(tree_array)
     
-    
-    print(total_count)
+    for row in tree_array:
+        for column in row:
+            #This handles the first and last rows
+            if row_index == 0 or row_index == (len(tree_array)-1):
+                total_count += 1
+            elif int(column_index) == 0 or int(column_index) == (len(row)-1):
+                total_count += 1
+            else:
+                current_tree_height = int(row[column_index])
+                                
+                # check all trees above current row and column
+                up_score = 0
+                for tree_row_index in reversed(range(0, row_index)):
+                    up_score += 1
+                    if current_tree_height <= int(tree_array[tree_row_index][column_index]):
+                        break
+                        
+                    
+                
+                # check all trees below current row and column
+                down_score = 0
+                for tree_row_index in range(row_index+1, len(tree_array)):
+                    down_score += 1
+                    if current_tree_height <= int(tree_array[tree_row_index][column_index]):
+                        break
+                
+                    
+                
+                # check all trees to left of current row and column
+                left_score = 0
+                for tree_col_index in reversed(range(0, column_index)):
+                    left_score += 1
+                    if current_tree_height <= int(row[tree_col_index]):
+                        break
+                
+                    
+                
+                # check all trees to right of current row and column
+                right_score = 0
+                for tree_col_index in range(column_index+1, len(row)):
+                    right_score += 1
+                    if current_tree_height <= int(row[tree_col_index]):
+                        break
+                    
+                    
+                
+                print(str(up_score) + " " + str(left_score) + " " + str(down_score) + " " + str(right_score))
+                
+                tree_score_array.append(right_score*left_score*up_score*down_score)
+                
+            column_index += 1
+            
+        row_index += 1
+            
+        column_index = 0
+        
+    tree_score_array.sort()
+    print(tree_score_array)
     
     
     
