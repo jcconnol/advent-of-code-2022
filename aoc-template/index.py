@@ -6,11 +6,11 @@ from collections import defaultdict
 
 
 def run_first_problem():
-            
-    file_lines = file_to_array("day-11/day-11.txt")
+    file_lines = file_to_array("input.txt")
 
     for line in file_lines:
         print(line)
+
     
     
         
@@ -45,7 +45,10 @@ def isUniqueChars(st):
     
 def file_to_array(file_name):
     line_array = []
-    with open(file_name) as my_file:
+    
+    full_file_name = os.path.join(os.path.dirname(__file__), file_name)
+    
+    with open(full_file_name) as my_file:
         for line in my_file:
             line_array.append(line.strip())
             
