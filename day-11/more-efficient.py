@@ -6,16 +6,17 @@ from collections import defaultdict
 import math
 import json
 import threading
-import concurrent.futures
-import requests
-import time
-import multiprocessing.dummy as mp 
-import multiprocessing
-from itertools import product
 
 test_monkey_obj = {
     0: {
-        "starting_items": [79, 98], 
+        "starting_items": [79, 98],
+        "worry_levels": [{
+            "throw_monkey_number": 0,
+            "new_worry_level": 79
+        }, {
+            "throw_monkey_number": 0,
+            "new_worry_level": 98
+        }],
         "operation": "* 19",
         "test_divisible": 23,
         "if_true_throw": 2,
@@ -24,6 +25,7 @@ test_monkey_obj = {
     },
     1: {
         "starting_items": [54, 65, 75, 74],
+        "worry_levels": [54, 65, 75, 74],
         "operation": "+ 6",
         "test_divisible": 19,
         "if_true_throw": 2,
@@ -32,6 +34,7 @@ test_monkey_obj = {
     },
     2: {
         "starting_items": [79, 60, 97],
+        "worry_levels": [79, 60, 97],
         "operation": "* old",
         "test_divisible": 13,
         "if_true_throw": 1,
@@ -40,6 +43,7 @@ test_monkey_obj = {
     },
     3: {
         "starting_items": [74],
+        "worry_levels": [74],
         "operation": "+ 3",
         "test_divisible": 17,
         "if_true_throw": 0,
@@ -48,7 +52,7 @@ test_monkey_obj = {
     },
 }
 
-monkey_obj = {
+test_monkey_obj = {
     0: {
         "starting_items": [92, 73, 86, 83, 65, 51, 55, 93],
         "operation": "* 5",
@@ -115,93 +119,65 @@ monkey_obj = {
     },
 }
 
-
-def run_concurrently(monkey, item):
-    test_monkey_obj[monkey]["monkey_business"] += 1
-    operation = test_monkey_obj[monkey]["operation"]
-    new_worry_level = 0
-    
-    if "old" in operation:
-        new_worry_level = item ** 2
-    else:
-        operation_array = operation.split(" ")
-        
-        operation_char = operation_array[0]
-        operation_number = int(operation_array[1])
-        if operation_char == "+":
-            new_worry_level = item + operation_number
-        if operation_char == "-":
-            new_worry_level = item - operation_number
-        if operation_char == "*":
-            new_worry_level = item * operation_number
-        
-    new_worry_level = math.floor(new_worry_level / 3)
-
-    #if divisible by
-    if not (new_worry_level % int(test_monkey_obj[monkey]["test_divisible"])):
-        throw_monkey_number = int(test_monkey_obj[monkey]["if_true_throw"])
-        test_monkey_obj[throw_monkey_number]["starting_items"].append(new_worry_level)
-        
-    #if not divisible by
-    else:
-        throw_monkey_number = int(test_monkey_obj[monkey]["if_false_throw"])
-        test_monkey_obj[throw_monkey_number]["starting_items"].append(new_worry_level)
-
+def setup_worrying_array():
+    print("whatever")
 
 
 def run_first_problem():
-    
-    
     monkey_num = len(test_monkey_obj)
     
     # find level of monkey business after 20 rounds
     for round in range(0, 20):
-        print(round)
         for monkey in range(0, monkey_num):
+            test_monkey_obj[monkey]["worry_levels"] = test_monkey_obj[monkey]["starting_items"]
             for item in test_monkey_obj[monkey]["starting_items"]:
-                pool = multiprocessing.Pool(4)
-                out1, out2, out3 = zip(*pool.map(run_concurrently, item, monkey, item))
+                #make thread
                 
-                # run_concurrently(monkey, item)
-
+                
+                
+                test_monkey_obj[monkey]["monkey_business"] += 1
+                operation = test_monkey_obj[monkey]["operation"]
+                new_worry_level = 0
+                
+                if "old" in operation:
+                    new_worry_level = item ** 2
+                else:
+                    operation_array = operation.split(" ")
+                    
+                    operation_char = operation_array[0]
+                    operation_number = int(operation_array[1])
+                    if operation_char == "+":
+                        new_worry_level = item + operation_number
+                    if operation_char == "-":
+                        new_worry_level = item - operation_number
+                    if operation_char == "*":
+                        new_worry_level = item * operation_number
+                    
+                throw_monkey_number = 0
+                if not (new_worry_level % int(test_monkey_obj[monkey]["test_divisible"])):
+                    throw_monkey_number = int(test_monkey_obj[monkey]["if_true_throw"])
+                else:
+                    throw_monkey_number = int(test_monkey_obj[monkey]["if_false_throw"])
+                    
+                test_monkey_obj[monkey]["worry_levels"][item]["throw_monkey_number"] = throw_monkey_number
+                test_monkey_obj[monkey]["worry_levels"][item]["new_worry_level"] = new_worry_level
+            
+            
+            
+            
+            
+            test_monkey_obj[monkey]["worry_levels"] = test_monkey_obj[monkey]["starting_items"]
             test_monkey_obj[monkey]["starting_items"] = []
+            
+            for item in test_monkey_obj["worry_levels"]:
+                throw_monkey_number = test_monkey_obj["worry_levels"][item]["throw_monkey_number"]
+                new_worry_level = test_monkey_obj["worry_levels"][item]["new_worry_level"]
+                test_monkey_obj[throw_monkey_number]["starting_items"].append(new_worry_level)
+            
+            test_monkey_obj[monkey]["worry_levels"] = []
         
     print(json.dumps(test_monkey_obj))
     
-    
-    
-    
-def isUniqueChars(st):
- 
-    # String length cannot be more than
-    # 256.
-    if len(st) > 256:
-        return False
- 
-    # Initialize occurrences of all characters
-    char_set = [False] * 128
- 
-    # For every character, check if it exists
-    # in char_set
-    for i in range(0, len(st)):
- 
-        # Find ASCII value and check if it
-        # exists in set.
-        val = ord(st[i])
-        if char_set[val]:
-            return False
- 
-        char_set[val] = True
- 
-    return True
-    
-def file_to_array(file_name):
-    line_array = []
-    with open(file_name) as my_file:
-        for line in my_file:
-            line_array.append(line.strip())
-            
-    return line_array
 
 if __name__ == '__main__':
     run_first_problem()
